@@ -15,7 +15,7 @@ else
 	endif
 endif
 
-FILENAME = PROJECT_NAME-$(VERSION)-$(PLATFORM)
+FILENAME = video-concat-$(VERSION)-$(PLATFORM)
 
 BUILDFLAGS = --onefile --name $(FILENAME)
 
