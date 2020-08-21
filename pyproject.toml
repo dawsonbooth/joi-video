@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "video-concat"
-version = "0.0.3"
+version = "1.0.0"
 description = ""
 authors = ["Dawson Booth <github@dawsonbooth.com>"]
 license = "MIT"
