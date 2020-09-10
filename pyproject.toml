@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "video-concat"
+name = "joi-video"
 version = "1.0.0"
 description = ""
 authors = ["Dawson Booth <github@dawsonbooth.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/dawsonbooth/video-concat"
-repository = "https://github.com/dawsonbooth/video-concat"
+homepage = "https://github.com/dawsonbooth/joi-video"
+repository = "https://github.com/dawsonbooth/joi-video"
 keywords = []
 classifiers = [
     "Environment :: Console",

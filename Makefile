@@ -15,7 +15,7 @@ else
 	endif
 endif
 
-FILENAME = video-concat-$(VERSION)-$(PLATFORM)
+FILENAME = joi-video-$(VERSION)-$(PLATFORM)
 
 BUILDFLAGS = --onefile --name $(FILENAME)
 
