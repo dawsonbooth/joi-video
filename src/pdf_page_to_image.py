@@ -4,15 +4,15 @@ import fitz
 from PIL import Image
 
 
-def page_to_image(pdf, page: int = 0):
+def pdf_page_to_image(filename, page: int = 0):
+    pdf = fitz.open(filename)
     pix = pdf.loadPage(page).getPixmap()
     img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
     return img
 
 
 def main(filename: str, page: int, outfile: str):
-    pdf = fitz.open(filename)
-    img = page_to_image(pdf, page=page)
+    img = pdf_page_to_image(filename, page=page)
     img.save(outfile)
 
 
