@@ -1,6 +1,9 @@
 import argparse
 
 import ffmpeg
+from pathlib import Path
+
+SILENCE = Path(__file__).parent.joinpath("silence.mp3")
 
 
 def get_video_stream(filename: str):
@@ -27,7 +30,8 @@ def load_image(filename: str, duration: float, width: int, height: int):
     )
     video = (
         clip
-        .filter('scale', size=f"{width}x{height}")
+        .filter('scale', size=f"{width}x{height}", force_original_aspect_ratio='decrease')
+        .filter('pad', str(width), str(height), '(ow-iw)/2', '(oh-ih)/2')
         .filter('fade', type='in', start_time=0, duration=.5)
         .filter('fade', type='out', start_time=duration - .5, duration=.5)
     )
@@ -39,24 +43,32 @@ def load_audio(filename: str, duration: float):
     return clip.audio
 
 
-def main(directory: str, image_duration: float, outfile: str) -> int:
-    video_stream = get_video_stream(f"{directory}/raw.mp4")
+def main(
+        directory: str,
+        image_duration: float,
+        outfile: str,
+        title: str = "Title.png",
+        disclaimer_start: str = "DisclaimerStart.png",
+        raw: str = "raw.mp4",
+        disclaimer_end: str = "DisclaimerEnd.png",
+        bumper: str = "Bumper.png",
+) -> int:
+    video_stream = get_video_stream(f"{directory}/{raw}")
 
     height = int(video_stream['height'])
     width = int(video_stream['width'])
     raw_duration = float(video_stream['duration'])
 
     title_video = load_image(
-        f"{directory}/Title.png", image_duration, width, height)
+        f"{directory}/{title}", image_duration, width, height)
     dis_start_video = load_image(
-        f"{directory}/DisclaimerStart.png", image_duration, width, height)
+        f"{directory}/{disclaimer_start}", image_duration, width, height)
     raw_video, raw_audio = load_video(f"{directory}/raw.mp4", raw_duration)
     dis_end_video = load_image(
-        f"{directory}/DisclaimerEnd.png", image_duration, width, height)
+        f"{directory}/{disclaimer_end}", image_duration, width, height)
     bumper_video = load_image(
-        f"{directory}/Bumper.png", image_duration, width, height)
-    silence_audio = load_audio(
-        f"{directory}/silence.mp3", duration=image_duration)
+        f"{directory}/{bumper}", image_duration, width, height)
+    silence_audio = load_audio(SILENCE, duration=image_duration)
 
     (
         ffmpeg
