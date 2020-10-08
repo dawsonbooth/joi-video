@@ -42,6 +42,9 @@ def build(c):
 def publish(c):
     c.run("mkdocs gh-deploy")
     c.run("poetry publish")
-    c.run('git commit -m "v$(VERSION)"')
-    c.run("git tag v$(VERSION)")
-    c.run("git push origin v$(VERSION)")
+
+    version = c.run("poetry version -s").stdout
+
+    c.run(f'git commit -m "v{version}"')
+    c.run(f"git tag v{version}")
+    c.run(f"git push origin v{version}")
