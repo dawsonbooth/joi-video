@@ -23,7 +23,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-zip-code-area = 'joi_video.__main__:main'
+joi-video = 'joi_video.__main__:main'
 
 [tool.poetry.dependencies]
 python = "^3.6"
