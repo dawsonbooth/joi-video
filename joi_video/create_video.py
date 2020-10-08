@@ -44,31 +44,30 @@ def load_audio(filename: str, duration: float):
 
 
 def main(
-        directory: str,
-        image_duration: float,
-        outfile: str,
-        title: str = "Title.png",
-        disclaimer_start: str = "DisclaimerStart.png",
-        raw: str = "raw.mp4",
-        disclaimer_end: str = "DisclaimerEnd.png",
-        bumper: str = "Bumper.png",
-) -> int:
-    video_stream = get_video_stream(f"{directory}/{raw}")
+        source: str,
+        title: str,
+        disclaimer_start: str,
+        disclaimer_end: str,
+        bumper: str,
+        output: str,
+        slide_duration: float,
+):
+    video_stream = get_video_stream(source)
 
     height = int(video_stream['height'])
     width = int(video_stream['width'])
     raw_duration = float(video_stream['duration'])
 
     title_video = load_image(
-        f"{directory}/{title}", image_duration, width, height)
+        title, slide_duration, width, height)
     dis_start_video = load_image(
-        f"{directory}/{disclaimer_start}", image_duration, width, height)
-    raw_video, raw_audio = load_video(f"{directory}/raw.mp4", raw_duration)
+        disclaimer_start, slide_duration, width, height)
+    raw_video, raw_audio = load_video(source, raw_duration)
     dis_end_video = load_image(
-        f"{directory}/{disclaimer_end}", image_duration, width, height)
+        disclaimer_end, slide_duration, width, height)
     bumper_video = load_image(
-        f"{directory}/{bumper}", image_duration, width, height)
-    silence_audio = load_audio(SILENCE, duration=image_duration)
+        bumper, slide_duration, width, height)
+    silence_audio = load_audio(SILENCE, duration=slide_duration)
 
     (
         ffmpeg
@@ -80,23 +79,7 @@ def main(
             bumper_video, silence_audio,
             v=1, a=1
         )
-        .output(outfile, pix_fmt='yuv420p', s=f"{width}x{height}", r=24, preset='ultrafast')
+        .output(output, pix_fmt='yuv420p', s=f"{width}x{height}", r=24, preset='ultrafast')
         .overwrite_output()
         .run()
     )
-
-    # Finish with no errors
-    return 0
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('directory', type=str,
-                        help="Path to directory containing media files")
-    parser.add_argument('--duration', type=float, default=7.0,
-                        help="Image duration")
-    parser.add_argument('--outfile', type=str, required=True,
-                        help="Output file path")
-    args = parser.parse_args()
-
-    exit(main(args.directory, args.duration, args.outfile))
