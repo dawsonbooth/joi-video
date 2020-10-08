@@ -18,17 +18,17 @@ def clean(c):
 
 @task
 def lint(c):
-    c.run("pylint joi-video")
+    c.run("pylint joi_video")
 
 
 @task
 def test(c):
-    c.run("pytest joi-video/test")
+    c.run("pytest joi_video/test")
 
 
 @task
 def docs(c):
-    c.run("pydoc-markdown -p joi-video > docs/documentation.md")
+    c.run("pydoc-markdown -p joi_video > docs/documentation.md")
     copy("README.md", "docs/README.md")
     c.run("mkdocs build --clean")
 

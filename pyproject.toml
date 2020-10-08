@@ -18,6 +18,13 @@ include = [
     "LICENSE",
 ]
 
+packages = [
+    { include = "joi_video" },
+]
+
+[tool.poetry.scripts]
+zip-code-area = 'joi_video.__main__:main'
+
 [tool.poetry.dependencies]
 python = "^3.6"
 ffmpeg-python = "^0.2.0"
@@ -32,10 +39,6 @@ pyinstaller = "^3.6"
 rope = "^0.17.0"
 invoke = "^1.4.1"
 pyclean = "^2.0.0"
-
-macholib = { version = "^1.8", markers = "sys_platform == 'darwin'" }
-pefile = { version = "^2017.8.1", markers = "sys_platform == 'win32'" }
-pywin32-ctypes = { version = "^0.2.0", markers = "sys_platform == 'win32'" }
 
 [build-system]
 requires = ["poetry>=0.12"]

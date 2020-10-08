@@ -1,7 +1,7 @@
 import argparse
 import configparser
 
-from concat_directory import main as concat_directory
+from .concat_directory import main as concat_directory
 
 # TODO: config module, convert pdf
 
