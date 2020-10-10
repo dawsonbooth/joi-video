@@ -1,14 +1,24 @@
+import argparse
 import mimetypes
 import os
 from pathlib import Path
 
 from colorama import Fore, Style
 
-from create_video import main as create_video # TODO: Make into module
+from .create_video import main as create_video
 
 
-def infer_paths() -> dict:
-    cwd = Path.cwd()
+def parse_directory() -> Path:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("directory", nargs='?', default=os.getcwd())
+
+    args = parser.parse_args()
+
+    return Path(args.directory)
+
+
+def infer_paths(directory: Path) -> dict:
     paths = {
         "source": "",
         "title": "",
@@ -18,7 +28,7 @@ def infer_paths() -> dict:
         "output": ""
     }
 
-    for f in os.listdir(cwd):
+    for f in os.listdir(directory):
         mimetype = str(mimetypes.guess_type(f)[0])
         filename = Path(f).name.lower()
         if mimetype.startswith("video"):
@@ -33,7 +43,7 @@ def infer_paths() -> dict:
             elif "bumper" in filename:
                 paths["bumper"] = f
 
-    paths["output"] = f"Joi_Delivers_Corp_Pres_{cwd.name}.mp4"
+    paths["output"] = f"Joi_Delivers_Corp_Pres_{directory.name}.mp4"
 
     return paths
 
@@ -69,7 +79,9 @@ def enter_config(paths: dict) -> dict:
 
 def main() -> int:
 
-    config = enter_config(infer_paths())
+    directory = parse_directory()
+
+    config = enter_config(infer_paths(directory))
 
     create_video(
         config["source"],
