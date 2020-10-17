@@ -3,7 +3,7 @@ import mimetypes
 import os
 from pathlib import Path
 
-from colorama import Fore, Style
+from colorama import Fore
 
 from .create_video import main as create_video
 
@@ -29,8 +29,9 @@ def infer_paths(directory: Path) -> dict:
     }
 
     for f in os.listdir(directory):
+        f = directory.joinpath(f)
         mimetype = str(mimetypes.guess_type(f)[0])
-        filename = Path(f).name.lower()
+        filename = f.name.lower()
         if mimetype.startswith("video"):
             paths["source"] = f
         elif mimetype.startswith("image"):
@@ -43,9 +44,15 @@ def infer_paths(directory: Path) -> dict:
             elif "bumper" in filename:
                 paths["bumper"] = f
 
-    paths["output"] = f"Joi_Delivers_Corp_Pres_{directory.name}.mp4"
+    paths["output"] = f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4"
 
     return paths
+
+
+def prompt(message: str, default: str):
+    return input(
+        f"{Fore.LIGHTBLUE_EX}{message} [{Fore.CYAN}{default}{Fore.LIGHTBLUE_EX}]: {Fore.RESET}"
+    ).strip() or default
 
 
 def enter_config(paths: dict) -> dict:
@@ -55,21 +62,21 @@ def enter_config(paths: dict) -> dict:
     try:
         print("Please enter the following information (press enter for default)...")
 
-        config["source"] = input(
-            f"Enter the path of the source video [{config['source']}]: ").strip() or config['source']
-        config["title"] = input(
-            f"Enter the path of the title screen [{config['title']}]: ").strip() or config['title']
-        config["disclaimer_start"] = input(
-            f"Enter the path of the initial disclaimer screen [{config['disclaimer_start']}]: ").strip() or config['disclaimer_start']
-        config["disclaimer_end"] = input(
-            f"Enter the path of the final disclaimer screen [{config['disclaimer_end']}]: ").strip() or config['disclaimer_end']
-        config["bumper"] = input(
-            f"Enter the path of the bumper screen [{config['bumper']}]: ").strip() or config['bumper']
-        config["output"] = input(
-            f"Enter the path of the output video [{config['output']}]: ").strip() or config['output']
+        config["source"] = prompt(
+            "Enter the path of the source video", config['source'])
+        config["title"] = prompt(
+            "Enter the path of the title screen", config['title'])
+        config["disclaimer_start"] = prompt(
+            "Enter the path of the initial disclaimer screen", config['disclaimer_start'])
+        config["disclaimer_end"] = prompt(
+            "Enter the path of the final disclaimer screen", config['disclaimer_start'])
+        config["bumper"] = prompt(
+            "Enter the path of the bumper screen", config['bumper'])
+        config["output"] = prompt(
+            "Enter the path of the output video", config['output'])
+        config["slide_duration"] = prompt(
+            "Enter the path of the slide screen duration", config['slide_duration'])
 
-        config["slide_duration"] = float(input(
-            f"Enter the slide screen duration: [{config['slide_duration']}]").strip() or config['slide_duration'])
     except KeyboardInterrupt:
         print("Cancelled.")
         exit(1)
