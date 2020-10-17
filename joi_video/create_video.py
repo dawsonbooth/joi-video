@@ -1,5 +1,3 @@
-import argparse
-
 import ffmpeg
 from pathlib import Path
 
@@ -79,7 +77,7 @@ def main(
             bumper_video, silence_audio,
             v=1, a=1
         )
-        .output(output, pix_fmt='yuv420p', s=f"{width}x{height}", r=24, preset='ultrafast')
+        .output(str(output), pix_fmt='yuv420p', s=f"{width}x{height}", r=24, preset='ultrafast')
         .overwrite_output()
         .run()
     )

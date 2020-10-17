@@ -5,7 +5,7 @@ from pathlib import Path
 
 from colorama import Fore
 
-from .create_video import main as create_video
+from create_video import main as create_video
 
 
 def parse_directory() -> Path:
@@ -44,7 +44,7 @@ def infer_paths(directory: Path) -> dict:
             elif "bumper" in filename:
                 paths["bumper"] = f
 
-    paths["output"] = f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4"
+    paths["output"] = directory.joinpath(f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
 
     return paths
 
@@ -78,7 +78,7 @@ def enter_config(paths: dict) -> dict:
             "Enter the path of the slide screen duration", config['slide_duration'])
 
     except KeyboardInterrupt:
-        print("Cancelled.")
+        print("\nCancelled.")
         exit(1)
 
     return config
