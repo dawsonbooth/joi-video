@@ -1,11 +1,11 @@
 import argparse
-import mimetypes
 import os
 from pathlib import Path
 
 from colorama import Fore
 
-from create_video import main as create_video
+from .create_video import main as create_video
+from .file import mimetype
 
 
 def parse_directory() -> Path:
@@ -30,11 +30,11 @@ def infer_paths(directory: Path) -> dict:
 
     for f in os.listdir(directory):
         f = directory.joinpath(f)
-        mimetype = str(mimetypes.guess_type(f)[0])
+        filetype = str(mimetype(f)[0])
         filename = f.name.lower()
-        if mimetype.startswith("video"):
+        if filetype.startswith("video"):
             paths["source"] = f
-        elif mimetype.startswith("image"):
+        elif filetype.startswith("image"):
             if "title" in filename:
                 paths["title"] = f
             elif "start" in filename and "disclaimer" in filename:
@@ -44,7 +44,8 @@ def infer_paths(directory: Path) -> dict:
             elif "bumper" in filename:
                 paths["bumper"] = f
 
-    paths["output"] = directory.joinpath(f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
+    paths["output"] = directory.joinpath(
+        f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
 
     return paths
 
@@ -69,7 +70,7 @@ def enter_config(paths: dict) -> dict:
         config["disclaimer_start"] = prompt(
             "Enter the path of the initial disclaimer screen", config['disclaimer_start'])
         config["disclaimer_end"] = prompt(
-            "Enter the path of the final disclaimer screen", config['disclaimer_start'])
+            "Enter the path of the final disclaimer screen", config['disclaimer_end'])
         config["bumper"] = prompt(
             "Enter the path of the bumper screen", config['bumper'])
         config["output"] = prompt(
