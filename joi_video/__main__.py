@@ -43,6 +43,8 @@ def infer_paths(directory: Path) -> dict:
                 paths["disclaimer_end"] = f
             elif "bumper" in filename:
                 paths["bumper"] = f
+        elif filetype.endswith("pdf"):
+            paths["title"] = f
 
     paths["output"] = directory.joinpath(
         f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
@@ -76,7 +78,7 @@ def enter_config(paths: dict) -> dict:
         config["output"] = prompt(
             "Enter the path of the output video", config['output'])
         config["slide_duration"] = prompt(
-            "Enter the path of the slide screen duration", config['slide_duration'])
+            "Enter the slide screen duration", config['slide_duration'])
 
     except KeyboardInterrupt:
         print("\nCancelled.")
