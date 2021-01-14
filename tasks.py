@@ -17,8 +17,18 @@ def clean(c):
 
 
 @task
+def format(c):
+    c.run("black joi_video --line-length 119")
+
+
+@task
 def lint(c):
-    c.run("pylint joi_video")
+    c.run("flake8 joi_video --max-line-length 119 --extend-ignore E203")
+
+
+@task
+def type_check(c):
+    c.run("mypy -m joi_video --ignore-missing-imports")
 
 
 @task

@@ -11,7 +11,7 @@ from .file import mimetype
 def parse_directory() -> Path:
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("directory", nargs='?', default=os.getcwd())
+    parser.add_argument("directory", nargs="?", default=os.getcwd())
 
     args = parser.parse_args()
 
@@ -19,14 +19,7 @@ def parse_directory() -> Path:
 
 
 def infer_paths(directory: Path) -> dict:
-    paths = {
-        "source": "",
-        "title": "",
-        "disclaimer_start": "",
-        "disclaimer_end": "",
-        "bumper": "",
-        "output": ""
-    }
+    paths = {"source": "", "title": "", "disclaimer_start": "", "disclaimer_end": "", "bumper": "", "output": ""}
 
     for f in os.listdir(directory):
         f = directory.joinpath(f)
@@ -46,16 +39,16 @@ def infer_paths(directory: Path) -> dict:
         elif filetype.endswith("pdf"):
             paths["title"] = f
 
-    paths["output"] = directory.joinpath(
-        f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
+    paths["output"] = directory.joinpath(f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
 
     return paths
 
 
 def prompt(message: str, default: str):
-    return input(
-        f"{Fore.LIGHTBLUE_EX}{message} [{Fore.CYAN}{default}{Fore.LIGHTBLUE_EX}]: {Fore.RESET}"
-    ).strip() or default
+    return (
+        input(f"{Fore.LIGHTBLUE_EX}{message} [{Fore.CYAN}{default}{Fore.LIGHTBLUE_EX}]: {Fore.RESET}").strip()
+        or default
+    )
 
 
 def enter_config(paths: dict) -> dict:
@@ -65,20 +58,15 @@ def enter_config(paths: dict) -> dict:
     try:
         print("Please enter the following information (press enter for default)...")
 
-        config["source"] = prompt(
-            "Enter the path of the source video", config['source'])
-        config["title"] = prompt(
-            "Enter the path of the title screen", config['title'])
+        config["source"] = prompt("Enter the path of the source video", config["source"])
+        config["title"] = prompt("Enter the path of the title screen", config["title"])
         config["disclaimer_start"] = prompt(
-            "Enter the path of the initial disclaimer screen", config['disclaimer_start'])
-        config["disclaimer_end"] = prompt(
-            "Enter the path of the final disclaimer screen", config['disclaimer_end'])
-        config["bumper"] = prompt(
-            "Enter the path of the bumper screen", config['bumper'])
-        config["output"] = prompt(
-            "Enter the path of the output video", config['output'])
-        config["slide_duration"] = prompt(
-            "Enter the slide screen duration", config['slide_duration'])
+            "Enter the path of the initial disclaimer screen", config["disclaimer_start"]
+        )
+        config["disclaimer_end"] = prompt("Enter the path of the final disclaimer screen", config["disclaimer_end"])
+        config["bumper"] = prompt("Enter the path of the bumper screen", config["bumper"])
+        config["output"] = prompt("Enter the path of the output video", config["output"])
+        config["slide_duration"] = prompt("Enter the slide screen duration", config["slide_duration"])
 
     except KeyboardInterrupt:
         print("\nCancelled.")
@@ -100,11 +88,11 @@ def main() -> int:
         config["disclaimer_end"],
         config["bumper"],
         config["output"],
-        config["slide_duration"]
+        config["slide_duration"],
     )
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())
