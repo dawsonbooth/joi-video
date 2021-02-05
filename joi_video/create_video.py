@@ -31,7 +31,7 @@ def main(
 
     (
         ffmpeg.concat(*title_media, *dis_start_media, *raw_media, *dis_end_media, *bumper_media, v=1, a=1)
-        .output(str(output), pix_fmt="yuv420p", s=f"{width}x{height}", r=24, preset="ultrafast")
+        .output(str(output), s=f"{width}x{height}", r=24, preset="ultrafast")
         .overwrite_output()
         .run()
     )
