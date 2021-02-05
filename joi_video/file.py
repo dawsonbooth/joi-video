@@ -38,6 +38,7 @@ def load_image(filename: str, duration: float, width: int, height: int):
     clip = ffmpeg.input(filename, t=duration, loop=1)
     video = (
         clip.filter("scale", size=f"{width}x{height}", force_original_aspect_ratio="decrease")
+        .filter("setsar", "1/1")
         .filter("pad", str(width), str(height), "(ow-iw)/2", "(oh-ih)/2")
         .filter("fade", type="in", start_time=0, duration=0.5)
         .filter("fade", type="out", start_time=duration - 0.5, duration=0.5)
