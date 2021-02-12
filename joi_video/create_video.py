@@ -1,20 +1,23 @@
+import os
+from typing import Union
+
 import ffmpeg
 
 from .file import load_file
 
 
-def get_video_stream(filename: str):
-    probe = ffmpeg.probe(filename)
+def get_video_stream(path: Union[str, os.PathLike]):
+    probe = ffmpeg.probe(path)
     return next((stream for stream in probe["streams"] if stream["codec_type"] == "video"), None)
 
 
 def main(
-    source: str,
-    title: str,
-    disclaimer_start: str,
-    disclaimer_end: str,
-    bumper: str,
-    output: str,
+    source: Union[str, os.PathLike],
+    title: Union[str, os.PathLike],
+    disclaimer_start: Union[str, os.PathLike],
+    disclaimer_end: Union[str, os.PathLike],
+    bumper: Union[str, os.PathLike],
+    output: Union[str, os.PathLike],
     slide_duration: float,
 ):
     video_stream = get_video_stream(source)

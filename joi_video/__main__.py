@@ -1,11 +1,12 @@
 import argparse
 import os
 from pathlib import Path
+from typing import Any, Dict, Union
 
 from colorama import Fore
 
 from .create_video import main as create_video
-from .file import mimetype
+from .file import is_image, is_pdf, is_video
 
 
 def parse_directory() -> Path:
@@ -18,41 +19,39 @@ def parse_directory() -> Path:
     return Path(args.directory)
 
 
-def infer_paths(directory: Path) -> dict:
-    paths = {"source": "", "title": "", "disclaimer_start": "", "disclaimer_end": "", "bumper": "", "output": ""}
+def infer_paths(directory: Path) -> Dict[str, Union[str, os.PathLike]]:
+    paths: Dict[str, Union[str, os.PathLike]] = dict()
 
-    for f in os.listdir(directory):
-        f = directory.joinpath(f)
-        filetype = str(mimetype(f)[0])
-        filename = f.name.lower()
-        if filetype.startswith("video"):
-            paths["source"] = f
-        elif filetype.startswith("image"):
+    for path in directory.glob("*.*"):
+        filename = path.name.lower()
+        if is_video(path):
+            paths["source"] = path
+        elif is_image(path):
             if "title" in filename:
-                paths["title"] = f
+                paths["title"] = path
             elif "start" in filename and "disclaimer" in filename:
-                paths["disclaimer_start"] = f
+                paths["disclaimer_start"] = path
             elif "end" in filename and "disclaimer" in filename:
-                paths["disclaimer_end"] = f
+                paths["disclaimer_end"] = path
             elif "bumper" in filename:
-                paths["bumper"] = f
-        elif filetype.endswith("pdf"):
-            paths["title"] = f
+                paths["bumper"] = path
+        elif is_pdf(path):
+            paths["title"] = path
 
     paths["output"] = directory.joinpath(f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
 
     return paths
 
 
-def prompt(message: str, default: str):
+def prompt(message: str, default: Any):
     return (
         input(f"{Fore.LIGHTBLUE_EX}{message} [{Fore.CYAN}{default}{Fore.LIGHTBLUE_EX}]: {Fore.RESET}").strip()
         or default
     )
 
 
-def enter_config(paths: dict) -> dict:
-    config = dict(paths)
+def enter_config(paths: Dict[str, Union[str, os.PathLike]]) -> Dict[str, Any]:
+    config: Dict[str, Any] = dict(paths)
     config["slide_duration"] = 7.0
 
     try:
@@ -66,7 +65,7 @@ def enter_config(paths: dict) -> dict:
         config["disclaimer_end"] = prompt("Enter the path of the final disclaimer screen", config["disclaimer_end"])
         config["bumper"] = prompt("Enter the path of the bumper screen", config["bumper"])
         config["output"] = prompt("Enter the path of the output video", config["output"])
-        config["slide_duration"] = prompt("Enter the slide screen duration", config["slide_duration"])
+        config["slide_duration"] = float(prompt("Enter the slide screen duration", config["slide_duration"]))
 
     except KeyboardInterrupt:
         print("\nCancelled.")
