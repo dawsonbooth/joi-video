@@ -8,6 +8,8 @@ from colorama import Fore
 from .create_video import main as create_video
 from .file import is_image, is_pdf, is_video
 
+from itertools import chain
+
 
 def parse_directory() -> Path:
     parser = argparse.ArgumentParser()
@@ -22,7 +24,9 @@ def parse_directory() -> Path:
 def infer_paths(directory: Path) -> Dict[str, Union[str, os.PathLike]]:
     paths: Dict[str, Union[str, os.PathLike]] = dict()
 
-    for path in directory.glob("*.*"):
+    files = chain(directory.glob("*.*"), directory.parent.glob("*.*"))
+
+    for path in files:
         filename = path.name.lower()
         if is_video(path):
             paths["source"] = path
