@@ -1,14 +1,13 @@
 import argparse
 import os
+from itertools import chain
 from pathlib import Path
 from typing import Any, Dict, Union
 
 from colorama import Fore
 
-from .create_video import main as create_video
-from .file import is_image, is_pdf, is_video
-
-from itertools import chain
+from create_video import main as create_video
+from file import is_image, is_pdf, is_video
 
 
 def parse_directory() -> Path:
@@ -42,7 +41,7 @@ def infer_paths(directory: Path) -> Dict[str, Union[str, os.PathLike]]:
         elif is_pdf(path):
             paths["title"] = path
 
-    paths["output"] = directory.joinpath(f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4")
+    paths["output"] = directory / f"Joi_Delivers_Corp_Pres_{directory.resolve().name}.mp4"
 
     return paths
 

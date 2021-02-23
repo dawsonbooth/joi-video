@@ -3,7 +3,7 @@ from typing import Union
 
 import ffmpeg
 
-from .file import load_file
+from file import load_file
 
 
 def get_video_stream(path: Union[str, os.PathLike]):

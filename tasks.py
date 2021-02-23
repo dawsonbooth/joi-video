@@ -1,60 +1,111 @@
+import contextlib
 import os
+import platform
 import shutil
+import sys
+from pathlib import Path
+from typing import Sequence
 
-from invoke import task
+from invoke import call, task
+from invoke.context import Context
+from invoke.runners import Result
+
+ROOT = Path(__file__).parent
+SRC = ROOT / "src"
 
 
-def copy(from_path: str, to_path: str):
-    if os.path.isdir(from_path):
-        shutil.copytree(from_path, to_path)
-    elif os.path.isfile(from_path):
-        shutil.copy(from_path, to_path)
+def _run(c: Context, command: str, *args: Sequence[str]) -> Result:
+    return c.run(f"{command} {' '.join(args)}", pty=platform.system() != "Windows")
 
 
 @task
+def clean_build(c):
+    """Clean up build"""
+    version = _run(c, "poetry version -s").stdout.rstrip()
+
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(ROOT / f"joi-video-{version}-{sys.platform}.spec")
+    shutil.rmtree(ROOT / "build", ignore_errors=True)
+    shutil.rmtree(ROOT / "dist", ignore_errors=True)
+
+
+@task
+def clean_python(c):
+    """Clean up python file artifacts"""
+    _run(c, f"pyclean {ROOT}")
+
+
+@task
+def clean_type_checking(c):
+    """Clean up files from type-checking"""
+    shutil.rmtree(ROOT / ".mypy_cache", ignore_errors=True)
+
+
+@task(pre=[clean_build, clean_python, clean_type_checking])
 def clean(c):
-    c.run("pyclean .")
+    """Run all clean sub-tasks"""
 
 
-@task
-def format(c):
-    c.run("black joi_video --line-length 119")
+@task(name="format", help={"check": "Checks if source is formatted without applying changes"})
+def format_(c, check=False):
+    """Format code"""
+    autoflake_args = ["-r", "--remove-all-unused-imports"]
+    isort_args = []
+    black_args = ["--quiet"]
 
+    if check:
+        isort_args += ["--check-only", "--diff"]
+        black_args += ["--diff", "--check"]
+    else:
+        autoflake_args += ["-i"]
 
-@task
-def lint(c):
-    c.run("flake8 joi_video --max-line-length 119 --extend-ignore E203")
+    _run(c, f"autoflake {SRC}", *autoflake_args)
+    _run(c, f"isort {SRC}", *isort_args)
+    _run(c, f"black {SRC}", *black_args)
 
 
 @task
 def type_check(c):
-    c.run("mypy -m joi_video --ignore-missing-imports")
+    """Run type-checking"""
+    _run(c, f"mypy {SRC} --ignore-missing-imports")
 
 
-@task
-def test(c):
-    c.run("pytest joi_video/test")
+@task(pre=[call(format_, check=True), type_check])
+def lint(c):
+    """Run all linting"""
+    _run(c, f"flake8 {SRC} --max-line-length 119 --extend-ignore E203,W503")
 
 
-@task
-def docs(c):
-    c.run("pydoc-markdown -p joi_video > docs/documentation.md")
-    copy("README.md", "docs/README.md")
-    c.run("mkdocs build --clean")
-
-
-@task
+@task(pre=[clean_build])
 def build(c):
-    c.run("poetry build")
+    """Build project distributable"""
+    version = _run(c, "poetry version -s").stdout.rstrip()
+    filename = f"joi-video-{version}-{sys.platform}"
+
+    _run(c, f"python -O -m PyInstaller --clean --onefile --name {filename} -y src/main.py")
 
 
 @task
-def publish(c):
-    c.run("mkdocs gh-deploy")
-    c.run("poetry publish")
+def tag(c):
+    """Create GitHub tag"""
+    version = _run(c, "poetry version -s").stdout.rstrip()
 
-    version = c.run("poetry version -s").stdout
+    _run(c, f"git tag v{version}")
+    _run(c, f"git push origin v{version}")
 
-    c.run(f'git commit -m "v{version}"')
-    c.run(f"git tag v{version}")
-    c.run(f"git push origin v{version}")
+
+@task
+def release(c):
+    """Create GitHub release"""
+    version = _run(c, "poetry version -s").stdout.rstrip()
+
+    _run(c, f'gh release create v{version} -t "joi-video v{version}"')
+
+
+@task
+def upload(c):
+    """Upload build as GitHub release"""
+    version = _run(c, "poetry version -s").stdout.rstrip()
+    filename = next(Path("dist").iterdir()).name
+
+    _run(c, f"gh release upload v{version} dist/{filename}")

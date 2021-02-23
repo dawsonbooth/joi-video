@@ -8,7 +8,7 @@ import ffmpeg
 import fitz
 from PIL import Image
 
-SILENCE = Path(__file__).parent.joinpath("silence.mp3")
+SILENCE = Path(__file__).parent / "silence.mp3"
 TEMP = Path(tempfile.gettempdir())
 
 
@@ -66,7 +66,7 @@ def load_image(path: Union[str, os.PathLike], duration: float, width: int, heigh
 
 def load_pdf_page(path: Union[str, os.PathLike], *args):
     img = pdf_page_to_image(path)
-    img_path = TEMP.joinpath("slide.png")
+    img_path = TEMP / "slide.png"
     img.save(img_path)
     return load_image(img_path, *args)
 
