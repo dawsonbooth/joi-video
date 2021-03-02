@@ -1,5 +1,6 @@
 import argparse
 import os
+from collections import defaultdict
 from itertools import chain
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -54,7 +55,7 @@ def prompt(message: str, default: Any):
 
 
 def enter_config(paths: Dict[str, Union[str, os.PathLike]]) -> Dict[str, Any]:
-    config: Dict[str, Any] = dict(paths)
+    config: Dict[str, Any] = defaultdict(Path, paths)
     config["slide_duration"] = 7.0
 
     try:
@@ -80,6 +81,8 @@ def enter_config(paths: Dict[str, Union[str, os.PathLike]]) -> Dict[str, Any]:
 def main() -> int:
 
     directory = parse_directory()
+
+    os.chdir(directory)
 
     config = enter_config(infer_paths(directory))
 

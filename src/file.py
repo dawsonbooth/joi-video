@@ -8,7 +8,7 @@ import ffmpeg
 import fitz
 from PIL import Image
 
-SILENCE = Path(__file__).parent / "silence.mp3"
+SILENCE = Path(__file__).parent.resolve() / "silence.mp3"
 TEMP = Path(tempfile.gettempdir())
 
 
