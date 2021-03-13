@@ -34,9 +34,16 @@ def prompt(
 
 
 def prompt_path(message: str, path: Optional[Path]) -> Path:
-    if path is None:
-        return prompt(message, path, Path, lambda _: "")
-    return prompt(message, path, Path, lambda p: str(p.relative_to(Path.cwd().resolve())))
+    def path_to_str(p: Optional[Path]) -> str:
+        if p is None:
+            return str()
+        try:
+            rel_path = p.relative_to(Path.cwd().resolve())
+        except ValueError:
+            rel_path = p.resolve()
+        return str(rel_path)
+
+    return prompt(message, path, Path, path_to_str)
 
 
 class Settings:
